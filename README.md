@@ -1,0 +1,2 @@
+# stichzaehler
+Kartenspiel Rage Stichzähler
