@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>Rage – Punkte & Rundenverwaltung (Mobile)</title>
+<style>
+  :root{
+    --bg:#f6f7fb;--panel:#fff;--primary:#2563eb;--ok:#16a34a;--bad:#dc2626;
+    --muted:#6b7280;--border:#e5e7eb;--round:#e8f7ea;--shadow:0 8px 24px rgba(0,0,0,.06);
+    --radius:14px;--pad:14px;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);color:#111827;-webkit-text-size-adjust:100%;
+  }
+  button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+  .container{max-width:1200px;margin:0 auto;padding:12px}
+  header{position:sticky;top:0;z-index:5;background:rgba(255,255,255,.92);backdrop-filter:saturate(1.2) blur(6px);border-bottom:1px solid var(--border)}
+  h1{margin:0 0 4px;font-size:20px;line-height:1.2}
+  .sub{color:var(--muted);font-size:13px}
+
+  .grid{display:grid;grid-template-columns:1.2fr .8fr;gap:12px}
+  @media (max-width:980px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:var(--pad)}
+  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .spacer{flex:1}
+  input[type=text]{flex:1;min-width:140px;padding:12px 14px;border:1px solid var(--border);border-radius:12px;font-size:16px}
+  button{
+    border:1px solid var(--border);background:#fff;border-radius:12px;padding:12px 14px;
+    font-weight:700;font-size:16px;cursor:pointer
+  }
+  button:disabled{opacity:.5;cursor:not-allowed}
+  .btn-primary{background:var(--primary);color:#fff;border-color:transparent}
+  .btn-ok{background:var(--ok);color:#fff;border-color:transparent}
+  .btn-danger{background:var(--bad);color:#fff;border-color:transparent}
+  .btn-ghost{background:#fff}
+  .hint{font-size:12px;color:var(--muted)}
+  .badge{padding:6px 10px;border-radius:999px;background:#eef2ff;color:#1e40af;font-weight:800;font-size:12px}
+
+  .info{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:8px}
+  @media (max-width:740px){.info{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  .i{border:1px solid var(--border);border-radius:12px;background:#fff;padding:10px;display:flex;flex-direction:column;gap:6px}
+  .i .t{font-size:12px;color:var(--muted)}
+  .i .v{font-size:18px;font-weight:800}
+
+  table{width:100%;border-collapse:collapse;margin-top:8px;border-radius:12px;overflow:hidden;border:1px solid var(--border)}
+  thead th{background:#f8fafc;text-align:center;padding:10px;font-size:13px;color:#374151;border-bottom:1px solid var(--border)}
+  tbody td{padding:6px;text-align:center;border-bottom:1px solid var(--border);background:#fff}
+  tr:last-child td{border-bottom:none}
+
+  .value-control{display:flex;justify-content:center;align-items:center;gap:10px}
+  .value{min-width:40px;padding:10px 12px;border:1px solid var(--border);border-radius:12px;background:#f9fafb;font-weight:800;font-size:18px}
+  .pm{width:44px;height:44px;border-radius:12px;border:1px solid var(--border);background:#fff;font-weight:900;font-size:22px;line-height:1}
+  .pm:disabled{opacity:.35}
+
+  .leader{box-shadow: inset 0 0 0 2px #ef4444}
+  .roundwin{background:var(--round)!important}
+
+  .rank-list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+  .rank-item{display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid var(--border);border-radius:12px;background:#fff;padding:10px}
+  .rank-item .nm{font-weight:800}
+  .rank-item .pts{font-weight:900}
+
+  details.round{border:1px solid var(--border);border-radius:12px;background:#fff;padding:10px;margin-top:10px}
+  details.round>summary{cursor:pointer;font-weight:800}
+  .small{font-size:12px;color:var(--muted)}
+  .history-table{margin-top:8px}
+  .sumRow{font-size:12px;color:#0f172a;margin-top:6px}
+
+  .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:30}
+  .modal{background:#fff;border-radius:18px;width:min(560px,96vw);padding:16px;border:1px solid var(--border);box-shadow:var(--shadow)}
+  .modal h3{margin:0 0 8px}
+  .modal .foot{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
+  .kbd{font-family:ui-monospace,Menlo,monospace;font-size:12px;border:1px solid var(--border);padding:2px 6px;border-radius:6px;background:#f1f5f9}
+</style>
+</head>
+<body>
+<header>
+  <div class="container">
+    <h1>Rage – Punkte & Rundenverwaltung</h1>
+    <div class="sub">iPhone/iPad • Sitzreihenfolge, Vorhersage-Dialog, Historie & Korrekturen</div>
+  </div>
+</header>
+
+<main class="container">
+  <div class="grid">
+    <!-- MAIN -->
+    <section class="card">
+      <!-- Player Setup (wird nach Spielstart vollständig ausgeblendet) -->
+      <div id="playerSetup">
+        <div class="row">
+          <input id="playerName" type="text" inputmode="text" placeholder="Spielername eingeben"/>
+          <button id="btnAdd" class="btn-primary">Spieler hinzufügen</button>
+        </div>
+        <div class="row" style="margin-top:6px;gap:6px">
+          <button class="btn-ghost" onclick="addPreset('Madleen')">Madleen</button>
+          <button class="btn-ghost" onclick="addPreset('Stefan')">Stefan</button>
+          <button class="btn-ghost" onclick="addPreset('Sedrick')">Sedrick</button>
+          <button class="btn-ghost" onclick="addPreset('Hannah')">Hannah</button>
+          <button class="btn-ghost" onclick="addPreset('Ella')">Ella</button>
+          <button class="btn-ghost" onclick="addPreset('Jan')">Jan</button>
+          <button class="btn-ghost" onclick="addPreset('Dörte')">Dörte</button>
+        </div>
+        <div class="row" style="margin-top:8px">
+          <span class="hint">Spieler erfassen. Erst danach: Spiel starten.</span>
+        </div>
+      </div>
+
+      <div class="info">
+        <div class="i"><div class="t">Aktuelle Runde</div><div class="v" id="infoRound">1</div></div>
+        <div class="i"><div class="t">Karten in dieser Runde</div><div class="v" id="infoCards">10</div></div>
+        <div class="i"><div class="t">Verteilt (Dealer)</div><div class="v" id="infoDealer">–</div></div>
+        <div class="i"><div class="t">Beginnt Vorhersage</div><div class="v" id="infoPredictor">–</div></div>
+      </div>
+
+      <div class="row" style="margin-top:10px;gap:8px">
+        <button id="btnStart" class="btn-primary" onclick="startGame()">Spiel starten</button>
+        <button id="btnRoundPredict" class="btn-ghost" onclick="openPredictionDialog()" disabled>Vorhersagen eingeben</button>
+        <button id="btnAdjust" class="btn-ghost" onclick="reopenPredictions()" disabled>Vorhersage erneut öffnen</button>
+        <button id="btnScore" class="btn-ok" onclick="scoreRound()" disabled>Rundenpunkte berechnen</button>
+        <div class="spacer"></div>
+        <span class="hint">Ablauf: Spieler → Start → Vorhersagen → Stiche → Punkte.</span>
+      </div>
+
+      <div id="trickSumHint" class="sumRow">Vergebene Stiche: <b id="sumTricks">0</b> / <b id="needTricks">10</b></div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Spielername</th>
+            <th>Gesamt&nbsp;Punkte</th>
+            <th>Runden&nbsp;Punkte</th>
+            <th>Vorhersage&nbsp;(Tip)</th>
+            <th>Tatsächliche&nbsp;Stiche</th>
+            <th>Bonus&nbsp;+5</th>
+            <th>Malus&nbsp;−5</th>
+            <th>Aktion</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+
+      <div id="editToolbar" class="row" style="display:none;margin-top:10px"></div>
+
+      <div class="row" style="margin-top:6px">
+        <span class="hint">Legende: Rundensieger grün, Gesamtführender rot umrahmt.</span>
+      </div>
+    </section>
+
+    <!-- SIDEBAR -->
+    <aside class="card">
+      <div class="row"><strong>Rangliste</strong><div class="spacer"></div><span class="small">live</span></div>
+      <div id="ranking" class="rank-list"></div>
+      <hr style="border:none;border-top:1px solid var(--border);margin:12px 0"/>
+      <div class="row"><strong>Historie</strong><div class="spacer"></div><span class="small">Runden korrigierbar</span></div>
+      <div id="history"></div>
+    </aside>
+  </div>
+</main>
+
+<!-- VORHERSAGE-MODAL -->
+<div id="modalBackdrop" class="modal-backdrop" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="predTitle">
+    <h3 id="predTitle">Vorhersagen – Runde <span id="predRound">1</span></h3>
+    <div class="small" id="predHelp">Beginn beim Ansager, dann im Uhrzeigersinn.</div>
+    <div id="predBody" style="margin-top:8px"></div>
+    <div class="foot">
+      <button class="btn-ghost" onclick="closePredictionDialog()">Abbrechen</button>
+      <button id="btnPredNext" class="btn-primary" onclick="predictionNext()">Weiter</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ======== State ======== */
+let players = []; // {id,name,points,roundPoints,prediction,tricks,plus5,minus5}
+let order = [];
+let gameStarted = false;
+
+let currentRound = 1;
+const totalRounds = 10;
+let cardsThisRound = 10;
+
+let dealerIndex = -1;
+let predictorIndex = -1;
+
+let predictionsLocked = false;
+let editModeRoundNo = 0; // 0 = kein Edit
+
+let roundHistory = [];
+
+/* ======== Helpers ======== */
+const $ = s => document.querySelector(s);
+function uid(){ return Math.random().toString(36).slice(2,9); }
+function byId(id){ return players.find(p=>p.id===id); }
+function sortRankingDesc(a,b){ return b.points - a.points; }
+
+function updateInfo(){
+  $("#infoRound").textContent = currentRound;
+  $("#infoCards").textContent = cardsThisRound;
+  $("#infoDealer").textContent = dealerIndex>=0? players[dealerIndex].name : "–";
+  $("#infoPredictor").textContent = predictorIndex>=0? players[predictorIndex].name : "–";
+  $("#needTricks").textContent = requiredTricksForRound();
+  $("#sumTricks").textContent = sumTricksNow();
+}
+
+function sumTricksNow(){ return players.reduce((s,p)=> s + (p.tricks||0), 0); }
+/* Gesamtzahl Stiche pro Runde = Kartenanzahl pro Spieler */
+function requiredTricksForRound(){ return cardsThisRound; }
+
+function canScoreRound(){
+  if(!gameStarted) return false;
+  if(!predictionsLocked) return false;
+  return sumTricksNow() === requiredTricksForRound();
+}
+
+function updateButtonsState(){
+  $("#btnRoundPredict").disabled = !(gameStarted && !predictionsLocked && editModeRoundNo===0);
+  $("#btnAdjust").disabled      = !(gameStarted && predictionsLocked  && editModeRoundNo===0);
+  $("#btnScore").disabled       = !(canScoreRound() && editModeRoundNo===0);
+}
+
+/* ======== Render ======== */
+function renderPlayersTable(){
+  const tbody = $("#tbody"); tbody.innerHTML = "";
+  const highestTotal = players.length ? Math.max(...players.map(p=>p.points)) : 0;
+  const highestRound = players.length ? Math.max(...players.map(p=>p.roundPoints)) : 0;
+  const haveHistory  = roundHistory.length>0;
+
+  players.forEach(p=>{
+    const tr = document.createElement("tr");
+    if((p.points===highestTotal) && (p.points!==0 || haveHistory)) tr.classList.add("leader");
+    if(haveHistory && p.roundPoints===highestRound) tr.classList.add("roundwin");
+
+    const predictionCell = (editModeRoundNo>0)
+      ? `<div class="value-control">
+            <button class="pm" onclick="chg('${p.id}','prediction',-1)">−</button>
+            <div class="value">${p.prediction}</div>
+            <button class="pm" onclick="chg('${p.id}','prediction',+1)">+</button>
+         </div>`
+      : `<div class="value">${p.prediction}</div>`;
+
+    const enableRoundInputs = (gameStarted && predictionsLocked) || (editModeRoundNo>0);
+
+    tr.innerHTML = `
+      <td>${p.name}</td>
+      <td><b>${p.points}</b></td>
+      <td>${p.roundPoints}</td>
+      <td>${predictionCell}</td>
+      <td>
+        <div class="value-control">
+          <button class="pm" onclick="chg('${p.id}','tricks',-1)" ${enableRoundInputs?'':'disabled'}>−</button>
+          <div class="value">${p.tricks}</div>
+          <button class="pm" onclick="chg('${p.id}','tricks',+1)" ${enableRoundInputs?'':'disabled'}>+</button>
+        </div>
+      </td>
+      <td>
+        <div class="value-control">
+          <button class="pm" onclick="chg('${p.id}','plus5',-1)" ${enableRoundInputs?'':'disabled'}>−</button>
+          <div class="value">${p.plus5}</div>
+          <button class="pm" onclick="chg('${p.id}','plus5',+1)" ${enableRoundInputs?'':'disabled'}>+</button>
+        </div>
+      </td>
+      <td>
+        <div class="value-control">
+          <button class="pm" onclick="chg('${p.id}','minus5',-1)" ${enableRoundInputs?'':'disabled'}>−</button>
+          <div class="value">${p.minus5}</div>
+          <button class="pm" onclick="chg('${p.id}','minus5',+1)" ${enableRoundInputs?'':'disabled'}>+</button>
+        </div>
+      </td>
+      <td>
+        <button class="btn-danger" onclick="removePlayer('${p.id}')" ${gameStarted?'disabled':''}>Entfernen</button>
+      </td>`;
+    tbody.appendChild(tr);
+  });
+
+  renderRanking();
+  updateInfo();
+  updateButtonsState();
+}
+
+function renderRanking(){
+  const box=$("#ranking"); box.innerHTML="";
+  [...players].sort(sortRankingDesc).forEach((p,i)=>{
+    const div=document.createElement("div");
+    div.className="rank-item";
+    div.innerHTML=`<div class="nm">#${i+1} — ${p.name}</div><div class="pts">${p.points}</div>`;
+    box.appendChild(div);
+  });
+}
+
+function renderHistory(){
+  const host=$("#history"); host.innerHTML="";
+  if(roundHistory.length===0){
+    host.innerHTML=`<div class="small">Noch keine abgeschlossenen Runden.</div>`;
+    return;
+  }
+  roundHistory.forEach(r=>{
+    const d=document.createElement("details");
+    d.className="round";
+    d.innerHTML=`
+      <summary>Runde ${r.round} • ${r.cards} Karten</summary>
+      <table class="history-table">
+        <thead>
+          <tr><th>Spieler</th><th>Vorhersage</th><th>Stiche</th><th>+5</th><th>−5</th><th>Rundenpunkte</th><th>Gesamt nach Runde</th></tr>
+        </thead>
+        <tbody>
+        ${r.entries.map(e=>`
+          <tr>
+            <td>${byId(e.id)?.name ?? '??'}</td>
+            <td>${e.pred}</td>
+            <td>${e.tricks}</td>
+            <td>${e.plus5}</td>
+            <td>${e.minus5}</td>
+            <td>${e.roundPoints}</td>
+            <td>${e.totalAfter}</td>
+          </tr>`).join("")}
+        </tbody>
+      </table>
+      <div class="row" style="margin-top:8px">
+        <button class="btn-ghost" onclick="editRound(${r.round})">Runde ${r.round} bearbeiten</button>
+        <div class="spacer"></div>
+        <span class="small">Abgeschlossen • Korrigierbar</span>
+      </div>`;
+    host.appendChild(d);
+  });
+}
+
+/* ======== Player input (jetzt hart gesperrt nach Spielstart + UI wird ausgeblendet) ======== */
+$("#btnAdd").addEventListener("click", ()=>{
+  if(gameStarted) return; // Hard guard
+  const name=$("#playerName").value.trim();
+  if(!name) return alert("Bitte einen Spielernamen eingeben.");
+  if(players.some(p=>p.name.toLowerCase()===name.toLowerCase())) return alert("Name bereits vorhanden.");
+  const p={id:uid(),name,points:0,roundPoints:0,prediction:0,tricks:0,plus5:0,minus5:0};
+  players.push(p); order.push(p.id);
+  $("#playerName").value="";
+  renderPlayersTable();
+});
+$("#playerName").addEventListener("keydown",(e)=>{ if(e.key==="Enter") $("#btnAdd").click(); });
+
+function addPreset(n){
+  if(gameStarted) return; // Hard guard
+  if(players.some(p=>p.name.toLowerCase()===n.toLowerCase())) return alert(n+" ist bereits hinzugefügt.");
+  const p={id:uid(),name:n,points:0,roundPoints:0,prediction:0,tricks:0,plus5:0,minus5:0};
+  players.push(p); order.push(p.id); renderPlayersTable();
+}
+
+function removePlayer(id){
+  if(gameStarted) return;
+  players = players.filter(p=>p.id!==id);
+  order   = order.filter(x=>x!==id);
+  renderPlayersTable();
+}
+
+/* ======== Change values ======== */
+function chg(id,field,delta){
+  const p=byId(id); if(!p) return;
+  if(!gameStarted && editModeRoundNo===0) return;               // vor Start keine Änderungen
+  if(field==="prediction" && editModeRoundNo===0) return;        // Vorhersage nur im Dialog (oder Edit)
+  p[field]=Math.max(0,(p[field]||0)+delta);
+  renderPlayersTable();
+}
+
+/* ======== Game flow ======== */
+function startGame(){
+  if(gameStarted) return;
+  if(players.length<2) return alert("Mindestens 2 Spieler erforderlich.");
+
+  dealerIndex = 0;
+  predictorIndex = players.length>1 ? 1 : 0;
+  gameStarted = true;
+  predictionsLocked = false;
+
+  // Start-Button & Player-Setup ausblenden
+  const btn=$("#btnStart"); if(btn) btn.style.display="none";
+  const setup=$("#playerSetup"); if(setup) setup.style.display="none";
+
+  $("#btnRoundPredict").disabled=false;
+  $("#btnScore").disabled=true;
+  $("#btnAdjust").disabled=true;
+  alert("Spiel gestartet. Bitte Vorhersagen eingeben.");
+  renderPlayersTable();
+}
+
+/* ======== Prediction dialog ======== */
+const modal=$("#modalBackdrop");
+let predOrder=[]; let predStep=0;
+
+function openPredictionDialog(){
+  if(!gameStarted || editModeRoundNo>0) return;
+  predOrder = order.slice();
+  const startId = players[predictorIndex]?.id;
+  while(predOrder[0]!==startId){ predOrder.push(predOrder.shift()); }
+  predStep=0;
+  $("#predRound").textContent=currentRound;
+  $("#predHelp").textContent=`Reihenfolge: beginnt ${players[predictorIndex].name}, dann im Uhrzeigersinn.`;
+  renderPredictionBody();
+  modal.style.display="flex";
+  modal.setAttribute("aria-hidden","false");
+}
+
+function renderPredictionBody(){
+  const id=predOrder[predStep]; const p=byId(id);
+  $("#predBody").innerHTML=`
+    <div class="row">
+      <strong>${p.name}</strong><div class="spacer"></div><span class="badge">Karten: ${cardsThisRound}</span>
+    </div>
+    <div class="row" style="margin-top:8px;justify-content:center">
+      <button class="pm" onclick="predDelta(-1)">−</button>
+      <div class="value" id="predVal">${p.prediction}</div>
+      <button class="pm" onclick="predDelta(+1)">+</button>
+    </div>
+    <div class="small" style="margin-top:6px">Tip über +/− wählen und „Weiter“.</div>`;
+  $("#btnPredNext").textContent = (predStep===predOrder.length-1) ? "Fertig" : "Weiter";
+}
+
+function predDelta(d){
+  const id=predOrder[predStep]; const p=byId(id);
+  p.prediction=Math.max(0,(p.prediction||0)+d);
+  $("#predVal").textContent=p.prediction;
+}
+
+function predictionNext(){
+  if(predStep<predOrder.length-1){ predStep++; renderPredictionBody(); }
+  else{
+    predictionsLocked = true;
+    closePredictionDialog();
+    alert("Vorhersagen abgeschlossen. Bitte Stiche erfassen.");
+    renderPlayersTable();
+  }
+}
+
+function closePredictionDialog(){
+  modal.style.display="none";
+  modal.setAttribute("aria-hidden","true");
+  updateButtonsState();
+}
+
+/* reopen allowed even after some trick inputs */
+function reopenPredictions(){
+  if(!gameStarted) return;
+  predictionsLocked=false;
+  openPredictionDialog();
+}
+
+/* ======== Scoring ======== */
+function calcRoundPointsForPlayer(p){
+  let rp=0;
+  rp += (p.prediction===p.tricks) ? 10 : -5;
+  rp += p.tricks;
+  rp += (p.plus5||0)*5;
+  rp -= (p.minus5||0)*5;
+  return rp;
+}
+
+function scoreRound(){
+  if(!canScoreRound()){
+    const sum=sumTricksNow(), need=requiredTricksForRound();
+    if(!predictionsLocked) alert("Vorhersagen sind noch nicht abgeschlossen.");
+    else alert(`Stiche passen nicht: verteilt = ${sum}, benötigt = ${need}.`);
+    return;
+  }
+
+  const entries=[];
+  players.forEach(p=>{
+    p.roundPoints = calcRoundPointsForPlayer(p);
+    p.points += p.roundPoints;
+  });
+  players.forEach(p=>{
+    entries.push({id:p.id,pred:p.prediction,tricks:p.tricks,plus5:p.plus5,minus5:p.minus5,roundPoints:p.roundPoints,totalAfter:p.points});
+  });
+  roundHistory.push({round:currentRound,cards:cardsThisRound,entries,closed:true});
+
+  // Reset rundenbasierte Felder
+  players.forEach(p=>{ p.prediction=0;p.tricks=0;p.plus5=0;p.minus5=0; });
+  predictionsLocked=false;
+
+  // nächste Runde
+  currentRound++;
+  cardsThisRound = Math.max(1,cardsThisRound-1);
+  // Ansager der vorherigen Runde wird Dealer; Ansager = Nächster
+  if(predictorIndex<0) predictorIndex=0;
+  dealerIndex = predictorIndex;
+  predictorIndex = (dealerIndex+1) % players.length;
+
+  if(currentRound>totalRounds){
+    const winner=[...players].sort(sortRankingDesc)[0];
+    renderPlayersTable(); renderHistory(); updateInfo();
+    alert(`Spiel beendet! Gewinner: ${winner.name} mit ${winner.points} Punkten.`);
+    $("#btnRoundPredict").disabled=true; $("#btnScore").disabled=true; $("#btnAdjust").disabled=true;
+    return;
+  }
+  renderPlayersTable(); renderHistory(); updateInfo();
+  $("#btnRoundPredict").disabled=false; $("#btnScore").disabled=true; $("#btnAdjust").disabled=true;
+}
+
+/* ======== History edit ======== */
+function editRound(roundNo){
+  const idx=roundHistory.findIndex(r=>r.round===roundNo);
+  if(idx<0) return alert("Runde nicht gefunden.");
+  const r=roundHistory[idx];
+
+  players.forEach(p=>{
+    const E=r.entries.find(e=>e.id===p.id)||{pred:0,tricks:0,plus5:0,minus5:0};
+    p.prediction=E.pred; p.tricks=E.tricks; p.plus5=E.plus5; p.minus5=E.minus5; p.roundPoints=0;
+  });
+
+  editModeRoundNo=roundNo;
+  $("#editToolbar").style.display="flex";
+  $("#editToolbar").innerHTML = `
+    <button class="btn-primary" onclick="saveRoundEdit(${roundNo},${idx})">Runde ${roundNo} speichern</button>
+    <button class="btn-ghost" onclick="cancelRoundEdit()">Abbrechen</button>
+    <span class="hint">Stiche dieser Runde müssen = ${r.cards} sein.</span>`;
+  $("#btnRoundPredict").disabled=true; $("#btnScore").disabled=true; $("#btnAdjust").disabled=true;
+  renderPlayersTable();
+}
+
+function cancelRoundEdit(){
+  editModeRoundNo=0;
+  $("#editToolbar").style.display="none";
+  players.forEach(p=>{ p.prediction=0;p.tricks=0;p.plus5=0;p.minus5=0;p.roundPoints=0; });
+  renderPlayersTable(); renderHistory(); updateButtonsState();
+}
+
+function saveRoundEdit(roundNo,idx){
+  const r=roundHistory[idx];
+  const need=r.cards;
+  const got=players.reduce((s,p)=>s+(p.tricks||0),0);
+  if(got!==need) return alert(`Stiche unpassend: verteilt = ${got}, benötigt = ${need}.`);
+
+  const newEntries=players.map(p=>{
+    const rp=calcRoundPointsForPlayer(p);
+    return {id:p.id,pred:p.prediction,tricks:p.tricks,plus5:p.plus5,minus5:p.minus5,roundPoints:rp,totalAfter:0};
+  });
+  r.entries=newEntries;
+
+  players.forEach(p=>{ p.points=0; p.roundPoints=0; });
+  for(const R of roundHistory){
+    const use = (R.round===roundNo)? r.entries : R.entries;
+    use.forEach(e=>{ byId(e.id).points += e.roundPoints; });
+    use.forEach(e=>{ e.totalAfter = byId(e.id).points; });
+    R.entries = use;
+  }
+
+  cancelRoundEdit();
+  alert(`Runde ${roundNo} aktualisiert und neu berechnet.`);
+}
+
+/* ======== Init ======== */
+renderPlayersTable(); renderHistory(); updateInfo();
+
+/* ======== Keyboard in modal (optional) ======== */
+document.addEventListener("keydown",(e)=>{
+  if($("#modalBackdrop").style.display==="flex"){
+    if(e.key==="+") predDelta(+1);
+    if(e.key==="-") predDelta(-1);
+    if(e.key==="Enter") predictionNext();
+    if(e.key==="Escape") closePredictionDialog();
+  }
+});
+</script>
+</body>
+</html>
