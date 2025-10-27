@@ -1,11 +1,9 @@
-# stichzaehler
-Kartenspiel Rage Stichzähler
 # 🎴 StichZähler  
-### Die clevere Punkteverwaltung für Stichspiele (Rage)
+### Die clevere Punkteverwaltung für Stichspiele (Rage, Wizard, Oh Hell u.a.)
 
 ![GitHub last commit](https://img.shields.io/github/last-commit/derbergsvater/stichzaehler?color=blue)
 ![GitHub repo size](https://img.shields.io/github/repo-size/derbergsvater/stichzaehler)
-![Static Badge](https://img.shields.io/badge/Platform-iPhone%20%7C%20iPad-lightgrey)
+![Platform](https://img.shields.io/badge/Platform-iPhone%20%7C%20iPad-lightgrey)
 ![License](https://img.shields.io/badge/license-Free%20for%20private%20use-green)
 
 ---
@@ -13,35 +11,35 @@ Kartenspiel Rage Stichzähler
 ## 📖 Übersicht
 
 **StichZähler** ist eine mobile Web-App, die das Punkte-Schreiben bei Stichspielen ersetzt.  
-Alles läuft lokal im Browser – kein Login, keine Werbung, keine Internetverbindung nötig.  
+Alles läuft **offline im Browser** – kein Login, keine Werbung, keine Cloud.
 
-➡️ **Live-Demo:**  
-[https://derbergsvater.github.io/stichzaehler](https://derbergsvater.github.io/stichzaehler)
+➡️ **Jetzt ausprobieren:**  
+👉 [https://derbergsvater.github.io/stichzaehler/stichzaehler.html](https://derbergsvater.github.io/stichzaehler/stichzaehler.html)
 
 ---
 
 ## 🎯 Hauptfunktionen
 
-- **Geführter Ablauf**  
-  Spieler hinzufügen → Spiel starten → Vorhersagen → Stiche → Punkteberechnung  
+- **Geführter Spielablauf**  
+  Spieler erfassen → Spiel starten → Vorhersagen → Stiche → Punkteberechnung  
 
 - **Offlinefähig**  
-  Keine Cloud, keine Speicherung externer Daten  
+  Kein Internet, keine Registrierung, keine Datenspeicherung auf Servern  
 
 - **Logikprüfung**  
-  Die Summe der Stiche muss mit der Kartenanzahl pro Runde übereinstimmen  
+  Stiche müssen der Kartenanzahl pro Runde entsprechen  
 
 - **Vorhersage-Dialog**  
-  Spieler tippen nacheinander über ein Touch-optimiertes Fenster  
+  Eingabe der Vorhersage über ein modales Fenster  
 
-- **Historie & Korrektur**  
-  Jede Runde bleibt nachvollziehbar und kann bei Bedarf korrigiert werden  
+- **Rundenhistorie & Korrektur**  
+  Jede Runde bleibt nachvollziehbar und kann nachträglich bearbeitet werden  
 
 - **Rangliste in Echtzeit**  
-  Live-Aktualisierung der Platzierungen  
+  Sofortige Anzeige der Platzierungen  
 
-- **Touch-optimiertes UI**  
-  Speziell für iPhone & iPad entwickelt – große Buttons, klar strukturierte Oberfläche  
+- **Touch-optimiertes Design**  
+  Große Buttons und optimierte Eingabe für iPhone & iPad  
 
 ---
 
@@ -58,51 +56,51 @@ Alles läuft lokal im Browser – kein Login, keine Werbung, keine Internetverbi
 
 ---
 
-## 📱 Verwendung auf iPhone & iPad
+## 📱 Nutzung auf iPhone & iPad
 
-1. Öffne den Link  
-   👉 [https://derbergsvater.github.io/stichzaehler](https://derbergsvater.github.io/stichzaehler)  
+1. Öffne den Link:  
+   👉 [https://derbergsvater.github.io/stichzaehler/stichzaehler.html](https://derbergsvater.github.io/stichzaehler/stichzaehler.html)  
 2. Tippe auf **Teilen → Zum Home-Bildschirm hinzufügen**  
-3. Das Spiel erscheint als App-Symbol auf deinem Homescreen  
-4. Funktioniert vollständig **offline**
+3. Das Icon erscheint auf deinem Homescreen  
+4. Danach ist die App **offline nutzbar**  
 
 ---
 
-## 🚀 GitHub Pages Deployment
+## ⚙️ Technische Infos
 
-**So kannst du das Projekt selbst hosten:**
-
-1. Repository erstellen auf [github.com/new](https://github.com/new)  
-   → Name: `stichzaehler`, **public**
-
-2. `index.html` hochladen (diese Datei)
-
-3. Unter **Settings → Pages**:  
-   - *Source*: „Deploy from branch“  
-   - *Branch*: `main` → `/ (root)`
-
-4. Fertig 🎉  
-   Die App ist jetzt erreichbar unter:  
-   `https://deinname.github.io/stichzaehler`
+- **Single-File-App** (`stichzaehler.html`)  
+- Keine externen Bibliotheken  
+- Vollständig offline-fähig  
+- Entwickelt mit **HTML5**, **CSS3 (Flexbox)** und **Vanilla JavaScript**  
+- Mobile-First-Design für iOS  
 
 ---
 
 ## 🧩 Geplante Features
 
 - 🗂️ Spielstände speichern (LocalStorage)  
-- 📄 CSV-/PDF-Export  
+- 📄 Export als CSV/PDF  
 - 🌙 Manueller Dark-Mode  
 - 🏆 Turniermodus  
 - 🌍 Mehrsprachigkeit (DE/EN/ES)  
 
 ---
 
-## ⚙️ Tech Stack
+## 🚀 GitHub Pages Setup (falls du es nachbauen willst)
 
-- **HTML5**, **CSS3 (Flexbox)**, **Vanilla JavaScript**  
-- Keine externen Libraries  
-- Vollständig offline-fähig  
-- Mobile-First-Design  
+1. Repository erstellen auf [github.com/new](https://github.com/new)  
+   → Name: `stichzaehler`, **public**
+
+2. Datei `stichzaehler.html` hochladen  
+
+3. Unter **Settings → Pages**:  
+   - Source: `Deploy from branch`  
+   - Branch: `main`  
+   - Folder: `/ (root)`  
+   - **Save**
+
+4. Deine App läuft jetzt unter:  
+   [https://deinname.github.io/stichzaehler/stichzaehler.html](https://deinname.github.io/stichzaehler/stichzaehler.html)
 
 ---
 
