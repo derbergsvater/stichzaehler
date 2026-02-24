@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>RAGE – Stichzähler 🔥</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=JetBrains+Mono:wght@400;700;800&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0c0c14; --bg2: #12121e; --panel: #16162a; --panel2: #1c1c35;
+    --red: #ff4757; --orange: #ffa502; --green: #2ed573; --blue: #4a9eff;
+    --pink: #ff6b9d; --purple: #a29bfe; --yellow: #ffd32a; --cyan: #18dcff;
+    --text: #e8e8f0; --muted: #6b6b8a; --border: rgba(255,255,255,0.07);
+    --glow-red: 0 0 20px rgba(255,71,87,0.3); --glow-green: 0 0 20px rgba(46,213,115,0.3);
+    --glow-orange: 0 0 20px rgba(255,165,2,0.3); --glow-blue: 0 0 20px rgba(74,158,255,0.3);
+    --radius: 14px; --pad: 16px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--text);
+    -webkit-text-size-adjust: 100%; overflow-x: hidden;
+    background-image:
+      radial-gradient(circle at 20% 20%, rgba(255,71,87,0.04) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(255,165,2,0.04) 0%, transparent 50%);
+  }
+  button { touch-action: manipulation; -webkit-tap-highlight-color: transparent; font-family: 'Nunito', sans-serif; }
+  .container { max-width: 1200px; margin: 0 auto; padding: 12px; }
+
+  /* ===== HEADER ===== */
+  header {
+    position: sticky; top: 0; z-index: 10;
+    background: rgba(12,12,20,0.88); backdrop-filter: blur(16px) saturate(1.4);
+    border-bottom: 1px solid var(--border); padding: 10px 0;
+  }
+  .header-inner { display: flex; align-items: center; gap: 12px; }
+  .logo {
+    font-family: 'Bangers', cursive; font-size: 32px; letter-spacing: 3px;
+    background: linear-gradient(135deg, var(--red), var(--orange), var(--yellow));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    text-shadow: none; filter: drop-shadow(0 0 8px rgba(255,71,87,0.3));
+  }
+  .logo-sub { color: var(--muted); font-size: 12px; font-weight: 600; letter-spacing: 1px; }
+
+  /* ===== GRID ===== */
+  .grid { display: grid; grid-template-columns: 1.3fr 0.7fr; gap: 14px; margin-top: 12px; }
+  @media (max-width: 980px) { .grid { grid-template-columns: 1fr; } }
+
+  /* ===== CARDS ===== */
+  .card {
+    background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: var(--pad); position: relative; overflow: hidden;
+  }
+  .card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--red), var(--orange), transparent);
+    opacity: 0.6;
+  }
+  .card-glow { box-shadow: var(--glow-red); }
+
+  /* ===== INFO BOXES ===== */
+  .info { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 10px; }
+  @media (max-width: 740px) { .info { grid-template-columns: repeat(2, 1fr); } }
+  .i {
+    border: 1px solid var(--border); border-radius: 12px; background: var(--panel2);
+    padding: 10px; display: flex; flex-direction: column; gap: 4px;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .i:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+  .i .t { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+  .i .v { font-size: 20px; font-weight: 900; font-family: 'JetBrains Mono', monospace; }
+  .i .v.round-num { color: var(--orange); }
+  .i .v.cards-num { color: var(--cyan); }
+  .i .v.dealer-name { color: var(--pink); }
+  .i .v.pred-name { color: var(--purple); }
+
+  /* ===== BUTTONS ===== */
+  .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .spacer { flex: 1; }
+  input[type=text] {
+    flex: 1; min-width: 140px; padding: 12px 14px;
+    background: var(--panel2); border: 1px solid var(--border); border-radius: 12px;
+    color: var(--text); font-size: 16px; font-family: 'Nunito', sans-serif;
+    transition: border-color 0.2s, box-shadow 0.2s; outline: none;
+  }
+  input[type=text]:focus { border-color: var(--red); box-shadow: 0 0 0 3px rgba(255,71,87,0.15); }
+  input[type=text]::placeholder { color: var(--muted); }
+
+  button {
+    border: 1px solid var(--border); background: var(--panel2); border-radius: 12px;
+    padding: 10px 14px; font-weight: 700; font-size: 14px; cursor: pointer;
+    color: var(--text); transition: all 0.2s; position: relative; overflow: hidden;
+  }
+  button:hover:not(:disabled) { transform: translateY(-1px); }
+  button:active:not(:disabled) { transform: translateY(0); }
+  button:disabled { opacity: 0.35; cursor: not-allowed; }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--red), #e8364a); color: #fff;
+    border-color: transparent; box-shadow: 0 4px 12px rgba(255,71,87,0.25);
+  }
+  .btn-primary:hover:not(:disabled) { box-shadow: var(--glow-red); }
+  .btn-ok {
+    background: linear-gradient(135deg, var(--green), #1db954); color: #fff;
+    border-color: transparent; box-shadow: 0 4px 12px rgba(46,213,115,0.25);
+  }
+  .btn-ok:hover:not(:disabled) { box-shadow: var(--glow-green); }
+  .btn-danger { background: var(--red); color: #fff; border-color: transparent; font-size: 12px; padding: 6px 10px; }
+  .btn-ghost { background: var(--panel2); color: var(--text); }
+  .btn-ghost:hover:not(:disabled) { background: rgba(255,255,255,0.08); }
+
+  .preset-btn {
+    background: var(--panel2); padding: 8px 12px; border-radius: 10px; font-size: 13px;
+    border: 1px solid var(--border); color: var(--muted); font-weight: 600;
+    transition: all 0.2s;
+  }
+  .preset-btn:hover { color: var(--orange); border-color: rgba(255,165,2,0.3); background: rgba(255,165,2,0.08); }
+  .preset-btn.used { opacity: 0.3; text-decoration: line-through; }
+
+  .hint { font-size: 12px; color: var(--muted); }
+  .badge {
+    padding: 5px 10px; border-radius: 999px; font-weight: 800; font-size: 12px;
+    background: rgba(255,165,2,0.15); color: var(--orange); border: 1px solid rgba(255,165,2,0.2);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* ===== TABLE ===== */
+  .table-wrap { overflow-x: auto; margin-top: 10px; border-radius: 12px; border: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; }
+  thead th {
+    background: var(--panel2); text-align: center; padding: 10px 6px; font-size: 11px;
+    color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 800;
+    border-bottom: 1px solid var(--border); white-space: nowrap;
+  }
+  tbody td {
+    padding: 8px 4px; text-align: center; border-bottom: 1px solid var(--border);
+    background: var(--panel); font-size: 14px; vertical-align: middle;
+  }
+  tr:last-child td { border-bottom: none; }
+  .player-name-cell { text-align: left; padding-left: 10px; font-weight: 800; white-space: nowrap; }
+
+  /* Leader & round winner highlights */
+  tr.leader td { box-shadow: inset 3px 0 0 var(--red); }
+  tr.roundwin td { background: rgba(46,213,115,0.06); }
+
+  /* ===== VALUE CONTROLS (+-) ===== */
+  .value-control { display: flex; justify-content: center; align-items: center; gap: 4px; }
+  .value {
+    min-width: 36px; padding: 6px 8px; border: 1px solid var(--border); border-radius: 10px;
+    background: var(--bg2); font-weight: 800; font-size: 16px; text-align: center;
+    font-family: 'JetBrains Mono', monospace; color: var(--text);
+  }
+  .pm {
+    width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--border);
+    background: var(--panel2); font-weight: 900; font-size: 18px; line-height: 1;
+    color: var(--text); display: flex; align-items: center; justify-content: center;
+    padding: 0;
+  }
+  .pm:hover:not(:disabled) { background: rgba(255,255,255,0.1); }
+  .pm:disabled { opacity: 0.2; }
+
+  /* Bonus/Malus column color */
+  .bonus-val { color: var(--green); }
+  .malus-val { color: var(--red); }
+
+  /* ===== TRICK SUM ===== */
+  .sum-row {
+    font-size: 13px; color: var(--muted); margin-top: 8px; padding: 8px 12px;
+    background: var(--panel2); border-radius: 10px; border: 1px solid var(--border);
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .sum-row b { color: var(--text); }
+  .sum-ok b { color: var(--green); }
+  .sum-bad b:first-of-type { color: var(--red); }
+
+  /* ===== RANKING ===== */
+  .rank-list { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+  .rank-item {
+    display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+    border: 1px solid var(--border); border-radius: 12px; background: var(--panel2);
+    transition: all 0.3s; position: relative; overflow: hidden;
+  }
+  .rank-item.first {
+    border-color: rgba(255,165,2,0.3); background: rgba(255,165,2,0.06);
+    box-shadow: 0 0 15px rgba(255,165,2,0.08);
+  }
+  .rank-pos {
+    font-family: 'Bangers', cursive; font-size: 20px; min-width: 30px; text-align: center;
+  }
+  .rank-pos.gold { color: var(--yellow); }
+  .rank-pos.silver { color: #aaa; }
+  .rank-pos.bronze { color: #cd7f32; }
+  .rank-name { font-weight: 800; flex: 1; }
+  .rank-pts { font-family: 'JetBrains Mono', monospace; font-weight: 900; font-size: 18px; }
+  .rank-rage { display: flex; align-items: center; gap: 4px; }
+  .rage-bar {
+    width: 40px; height: 5px; border-radius: 3px; background: rgba(255,255,255,0.06);
+    overflow: hidden; position: relative;
+  }
+  .rage-fill { height: 100%; border-radius: 3px; transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  .rage-emoji { font-size: 14px; }
+
+  /* ===== HISTORY ===== */
+  details.round {
+    border: 1px solid var(--border); border-radius: 12px; background: var(--panel2);
+    padding: 10px; margin-top: 8px;
+  }
+  details.round > summary {
+    cursor: pointer; font-weight: 800; font-size: 14px; color: var(--muted);
+    list-style: none; display: flex; align-items: center; gap: 8px;
+  }
+  details.round > summary::before { content: '▸'; transition: transform 0.2s; }
+  details.round[open] > summary::before { transform: rotate(90deg); }
+  details.round > summary::-webkit-details-marker { display: none; }
+  .history-table { margin-top: 8px; }
+  .history-table table { font-size: 12px; }
+  .small { font-size: 12px; color: var(--muted); }
+
+  /* ===== MODAL ===== */
+  .modal-backdrop {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
+    display: none; align-items: center; justify-content: center; z-index: 30;
+  }
+  .modal {
+    background: var(--panel); border-radius: 20px; width: min(480px, 94vw);
+    padding: 24px; border: 1px solid var(--border);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5); animation: modalIn 0.3s ease-out;
+  }
+  @keyframes modalIn { from { opacity: 0; transform: scale(0.9) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+  .modal h3 {
+    font-family: 'Bangers', cursive; font-size: 24px; letter-spacing: 2px;
+    color: var(--orange); margin: 0 0 4px;
+  }
+  .modal .foot { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
+  .pred-player-name {
+    font-size: 22px; font-weight: 900; margin: 12px 0 4px;
+  }
+  .pred-value-area {
+    display: flex; align-items: center; justify-content: center; gap: 16px; margin: 16px 0;
+  }
+  .pred-big-val {
+    font-family: 'JetBrains Mono', monospace; font-size: 48px; font-weight: 900;
+    min-width: 80px; text-align: center; padding: 10px; border-radius: 16px;
+    background: var(--bg); border: 2px solid var(--border);
+    transition: all 0.2s;
+  }
+  .pred-big-btn {
+    width: 56px; height: 56px; border-radius: 14px; font-size: 28px; font-weight: 900;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--panel2); border: 1px solid var(--border); color: var(--text);
+    cursor: pointer; transition: all 0.15s;
+  }
+  .pred-big-btn:hover { background: rgba(255,255,255,0.1); transform: scale(1.05); }
+  .pred-progress { display: flex; gap: 4px; margin: 12px 0; justify-content: center; }
+  .pred-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: rgba(255,255,255,0.1); transition: all 0.3s;
+  }
+  .pred-dot.done { background: var(--green); }
+  .pred-dot.current { background: var(--orange); transform: scale(1.3); }
+
+  /* ===== CONFETTI ===== */
+  .confetti-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 50; overflow: hidden; }
+  .confetti-piece {
+    position: absolute; top: -10px; animation: confettiFall linear forwards;
+  }
+  @keyframes confettiFall {
+    0% { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
+    80% { opacity: 1; }
+    100% { transform: translateY(100vh) rotate(720deg) scale(0.5); opacity: 0; }
+  }
+
+  /* ===== TOAST ===== */
+  .toast {
+    position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px);
+    background: var(--panel); border: 1px solid var(--border); border-radius: 14px;
+    padding: 12px 24px; z-index: 40; font-weight: 700; font-size: 15px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4); backdrop-filter: blur(10px);
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); opacity: 0;
+    text-align: center; max-width: 90%;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+  /* ===== TRASH TALK ===== */
+  .trash-talk {
+    margin-top: 10px; display: flex; flex-direction: column; gap: 6px;
+  }
+  .trash-msg {
+    padding: 8px 12px; border-radius: 10px; font-size: 13px; font-weight: 600;
+    animation: slideUp 0.4s ease-out both; border: 1px solid var(--border);
+    background: var(--panel2);
+  }
+  @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ===== GAME OVER ===== */
+  .game-over-banner {
+    text-align: center; padding: 24px; margin-top: 12px;
+    background: linear-gradient(135deg, rgba(255,165,2,0.1), rgba(255,71,87,0.1));
+    border: 1px solid rgba(255,165,2,0.2); border-radius: 16px;
+  }
+  .game-over-banner .trophy { font-size: 60px; }
+  .game-over-banner .winner-name {
+    font-family: 'Bangers', cursive; font-size: 36px; letter-spacing: 3px;
+    color: var(--yellow);
+  }
+  .game-over-banner .winner-pts {
+    font-family: 'JetBrains Mono', monospace; font-size: 24px; font-weight: 900;
+    color: var(--orange);
+  }
+
+  /* ===== ANIMATION HELPERS ===== */
+  @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+  .shake { animation: shake 0.3s; }
+  @keyframes pop { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
+  .pop { animation: pop 0.3s; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  /* ===== SECTION TITLES ===== */
+  .section-title {
+    font-family: 'Bangers', cursive; font-size: 16px; letter-spacing: 2px; color: var(--muted);
+  }
+
+  /* ===== EDIT TOOLBAR ===== */
+  #editToolbar {
+    display: none; margin-top: 10px; padding: 10px;
+    background: rgba(255,165,2,0.08); border: 1px solid rgba(255,165,2,0.2);
+    border-radius: 12px;
+  }
+</style>
+</head>
+<body>
+
+<!-- TOAST -->
+<div id="toast" class="toast"></div>
+
+<!-- CONFETTI CONTAINER -->
+<div id="confettiContainer" class="confetti-container"></div>
+
+<header>
+  <div class="container">
+    <div class="header-inner">
+      <div>
+        <div class="logo">🔥 RAGE</div>
+      </div>
+      <div>
+        <div class="logo-sub">STICHZÄHLER • WER BEHÄLT DIE NERVEN?</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+  <div class="grid">
+    <!-- ===== MAIN PANEL ===== -->
+    <section class="card">
+      <!-- Player Setup -->
+      <div id="playerSetup">
+        <div class="row">
+          <input id="playerName" type="text" inputmode="text" placeholder="Spielername eingeben..."/>
+          <button id="btnAdd" class="btn-primary">+ Spieler</button>
+        </div>
+        <div class="row" style="margin-top:8px; gap:6px; flex-wrap:wrap;">
+          <button class="preset-btn" onclick="addPreset(this,'Madleen')">Madleen</button>
+          <button class="preset-btn" onclick="addPreset(this,'Stefan')">Stefan</button>
+          <button class="preset-btn" onclick="addPreset(this,'Sedrick')">Sedrick</button>
+          <button class="preset-btn" onclick="addPreset(this,'Hannah')">Hannah</button>
+          <button class="preset-btn" onclick="addPreset(this,'Ella')">Ella</button>
+          <button class="preset-btn" onclick="addPreset(this,'Jan')">Jan</button>
+          <button class="preset-btn" onclick="addPreset(this,'Dörte')">Dörte</button>
+          <button class="preset-btn" onclick="addPreset(this,'Wolly')">Wolly</button>
+        </div>
+        <div class="hint" style="margin-top:8px;">Spieler erfassen, dann Spiel starten. Mindestens 2 Spieler.</div>
+      </div>
+
+      <!-- Info Boxes -->
+      <div class="info">
+        <div class="i"><div class="t">Runde</div><div class="v round-num" id="infoRound">1</div></div>
+        <div class="i"><div class="t">Karten</div><div class="v cards-num" id="infoCards">10</div></div>
+        <div class="i"><div class="t">Dealer</div><div class="v dealer-name" id="infoDealer">–</div></div>
+        <div class="i"><div class="t">Beginnt</div><div class="v pred-name" id="infoPredictor">–</div></div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="row" style="margin-top:12px; gap:8px;">
+        <button id="btnStart" class="btn-primary" onclick="startGame()">🎮 Spiel starten</button>
+        <button id="btnRoundPredict" class="btn-ghost" onclick="openPredictionDialog()" disabled>🔮 Vorhersagen</button>
+        <button id="btnAdjust" class="btn-ghost" onclick="reopenPredictions()" disabled>↩ Korrektur</button>
+        <button id="btnScore" class="btn-ok" onclick="scoreRound()" disabled>✅ Runde werten</button>
+      </div>
+
+      <!-- Trash Talk Area -->
+      <div id="trashTalk" class="trash-talk"></div>
+
+      <!-- Trick Sum -->
+      <div id="trickSumHint" class="sum-row">
+        Stiche: <b id="sumTricks">0</b> / <b id="needTricks">10</b>
+      </div>
+
+      <!-- Player Table -->
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Spieler</th>
+              <th>Gesamt</th>
+              <th>Runde</th>
+              <th>Tipp</th>
+              <th>Stiche</th>
+              <th>+5 ✨</th>
+              <th>−5 💀</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+
+      <!-- Edit Toolbar -->
+      <div id="editToolbar" class="row"></div>
+
+      <div class="hint" style="margin-top:8px;">
+        🟢 = Rundensieger &nbsp; 🔴 = Gesamtführung
+      </div>
+
+      <!-- Game Over Banner -->
+      <div id="gameOverBanner" class="game-over-banner" style="display:none;"></div>
+    </section>
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="card">
+      <div class="row">
+        <span class="section-title">🏆 RANGLISTE</span>
+        <div class="spacer"></div>
+        <span class="small">live</span>
+      </div>
+      <div id="ranking" class="rank-list"></div>
+
+      <hr style="border:none; border-top:1px solid var(--border); margin:14px 0;" />
+
+      <div class="row">
+        <span class="section-title">📜 HISTORIE</span>
+        <div class="spacer"></div>
+        <span class="small">korrigierbar</span>
+      </div>
+      <div id="history"></div>
+    </aside>
+  </div>
+</main>
+
+<!-- ===== PREDICTION MODAL ===== -->
+<div id="modalBackdrop" class="modal-backdrop" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true">
+    <h3>VORHERSAGE – Runde <span id="predRound">1</span></h3>
+    <div class="small" id="predHelp">Beginnt beim Ansager, dann im Uhrzeigersinn.</div>
+    <div class="pred-progress" id="predProgress"></div>
+    <div id="predBody" style="margin-top:8px;"></div>
+    <div class="foot">
+      <button class="btn-ghost" onclick="closePredictionDialog()">Abbrechen</button>
+      <button id="btnPredNext" class="btn-primary" onclick="predictionNext()">Weiter ➜</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ================================================================
+   STATE
+   ================================================================ */
+const PLAYER_EMOJIS = ['🔥','💀','👹','🃏','⚡','🎯','🐉','💎','🦊','🎪'];
+const PLAYER_COLORS = ['#ff4757','#ffa502','#2ed573','#4a9eff','#ff6b9d','#a29bfe','#ffd32a','#18dcff','#fd79a8','#55efc4'];
+
+let players = [];
+let order = [];
+let gameStarted = false;
+let currentRound = 1;
+const totalRounds = 10;
+let cardsThisRound = 10;
+let dealerIndex = -1;
+let predictorIndex = -1;
+let predictionsLocked = false;
+let editModeRoundNo = 0;
+let roundHistory = [];
+
+/* ================================================================
+   TRASH TALK
+   ================================================================ */
+const TALK_PERFECT = [
+  "ABSOLUTER WAHNSINN! 🎯","Hellseher?! 👁️","Kalt wie Eis! ❄️",
+  "Maschine! 🤖","Das war EISKALT berechnet!","BOOM! Volltreffer! 💥",
+  "Nostradamus wäre stolz!","Unantastbar! 👑","Perfekt kalkuliert! 🧠",
+  "Wie ein offenes Buch gelesen! 📖"
+];
+const TALK_FAIL = [
+  "TOTAL DANEBEN! 😂","Aua, das tat weh! 💀","Voll in die Rage! 😡",
+  "EPIC FAIL! 🤦","Komplett verrechnet! 📉","Da hilft nur noch beten! 🙏",
+  "Peinlich, peinlich... 😬","Das war wohl nix... 🫠","Katastrophe! 🌪️",
+  "Zurück auf Los! 🎲"
+];
+const TALK_ZERO_HERO = [
+  "NULL und stolz drauf! 🦸","Die Null steht wie eine Eins!",
+  "Zen-Meister! 🧘","Strategisches Nichts! ✨"
+];
+const TALK_BONUS = [
+  "Bonus kassiert! Ka-Ching! 💰","Extra-Punkte, Baby! 🎉","Der Glückspilz! 🍀"
+];
+const TALK_MALUS = [
+  "Rage-Rache schlägt zu! 💀","Autsch, Malus kassiert! 😈","Das Karma schlägt zurück! ⚡"
+];
+
+function randomFrom(arr) { return arr[Math.floor(Math.random()*arr.length)]; }
+
+/* ================================================================
+   HELPERS
+   ================================================================ */
+const $ = s => document.querySelector(s);
+function uid() { return Math.random().toString(36).slice(2,9); }
+function byId(id) { return players.find(p => p.id === id); }
+
+function updateInfo() {
+  $('#infoRound').textContent = currentRound;
+  $('#infoCards').textContent = cardsThisRound;
+  $('#infoDealer').textContent = dealerIndex >= 0 ? players[dealerIndex].name : '–';
+  $('#infoPredictor').textContent = predictorIndex >= 0 ? players[predictorIndex].name : '–';
+  $('#needTricks').textContent = requiredTricksForRound();
+  const sum = sumTricksNow(), need = requiredTricksForRound();
+  $('#sumTricks').textContent = sum;
+  const hint = $('#trickSumHint');
+  hint.classList.remove('sum-ok','sum-bad');
+  if (sum === need) hint.classList.add('sum-ok');
+  else if (sum > 0) hint.classList.add('sum-bad');
+}
+
+function sumTricksNow() { return players.reduce((s,p) => s + (p.tricks||0), 0); }
+function requiredTricksForRound() { return cardsThisRound; }
+
+function canScoreRound() {
+  if (!gameStarted || !predictionsLocked) return false;
+  return sumTricksNow() === requiredTricksForRound();
+}
+
+function updateButtonsState() {
+  $('#btnRoundPredict').disabled = !(gameStarted && !predictionsLocked && editModeRoundNo === 0);
+  $('#btnAdjust').disabled = !(gameStarted && predictionsLocked && editModeRoundNo === 0);
+  $('#btnScore').disabled = !(canScoreRound() && editModeRoundNo === 0);
+}
+
+/* ================================================================
+   TOAST
+   ================================================================ */
+let toastTimer;
+function showToast(msg) {
+  const el = $('#toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
+}
+
+/* ================================================================
+   CONFETTI
+   ================================================================ */
+function fireConfetti() {
+  const container = $('#confettiContainer');
+  const colors = ['#ff4757','#ffa502','#2ed573','#4a9eff','#eccc68','#a29bfe','#ff6b9d','#ffd32a'];
+  for (let i = 0; i < 60; i++) {
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    piece.style.left = Math.random()*100 + '%';
+    piece.style.width = (4 + Math.random()*8) + 'px';
+    piece.style.height = (6 + Math.random()*10) + 'px';
+    piece.style.backgroundColor = colors[i % colors.length];
+    piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+    piece.style.animationDuration = (1.5 + Math.random()*2) + 's';
+    piece.style.animationDelay = (Math.random()*0.6) + 's';
+    container.appendChild(piece);
+  }
+  setTimeout(() => { container.innerHTML = ''; }, 4000);
+}
+
+/* ================================================================
+   RAGE METER
+   ================================================================ */
+function getRageLevel(playerId) {
+  const recent = roundHistory.slice(-3);
+  let rage = 0;
+  recent.forEach(round => {
+    const e = round.entries.find(e => e.id === playerId);
+    if (e && e.pred !== e.tricks) rage += Math.abs(e.pred - e.tricks) * 20;
+  });
+  return Math.min(100, rage);
+}
+
+function rageEmoji(level) {
+  if (level < 15) return '😌';
+  if (level < 35) return '😐';
+  if (level < 55) return '😤';
+  if (level < 75) return '🤬';
+  return '💀';
+}
+
+function rageColor(level) {
+  if (level < 35) return 'var(--green)';
+  if (level < 65) return 'var(--orange)';
+  return 'var(--red)';
+}
+
+/* ================================================================
+   RENDER: TABLE
+   ================================================================ */
+function renderPlayersTable() {
+  const tbody = $('#tbody');
+  tbody.innerHTML = '';
+  const highestTotal = players.length ? Math.max(...players.map(p => p.points)) : 0;
+  const highestRound = players.length ? Math.max(...players.map(p => p.roundPoints)) : 0;
+  const haveHistory = roundHistory.length > 0;
+
+  players.forEach((p, idx) => {
+    const tr = document.createElement('tr');
+    if ((p.points === highestTotal) && (p.points !== 0 || haveHistory)) tr.classList.add('leader');
+    if (haveHistory && p.roundPoints === highestRound && p.roundPoints !== 0) tr.classList.add('roundwin');
+
+    const emoji = PLAYER_EMOJIS[idx % PLAYER_EMOJIS.length];
+    const color = PLAYER_COLORS[idx % PLAYER_COLORS.length];
+
+    const predictionCell = (editModeRoundNo > 0)
+      ? `<div class="value-control">
+           <button class="pm" onclick="chg('${p.id}','prediction',-1)">−</button>
+           <div class="value">${p.prediction}</div>
+           <button class="pm" onclick="chg('${p.id}','prediction',+1)">+</button>
+         </div>`
+      : `<div class="value">${p.prediction}</div>`;
+
+    const enableInputs = (gameStarted && predictionsLocked) || (editModeRoundNo > 0);
+
+    tr.innerHTML = `
+      <td class="player-name-cell">
+        <span style="margin-right:4px;">${emoji}</span>
+        <span style="color:${color}">${p.name}</span>
+      </td>
+      <td><b style="font-family:'JetBrains Mono',monospace;font-size:16px;">${p.points}</b></td>
+      <td style="font-family:'JetBrains Mono',monospace;">${p.roundPoints}</td>
+      <td>${predictionCell}</td>
+      <td>
+        <div class="value-control">
+          <button class="pm" onclick="chg('${p.id}','tricks',-1)" ${enableInputs ? '' : 'disabled'}>−</button>
+          <div class="value">${p.tricks}</div>
+          <button class="pm" onclick="chg('${p.id}','tricks',+1)" ${enableInputs ? '' : 'disabled'}>+</button>
+        </div>
+      </td>
+      <td>
+        <div class="value-control">
+          <button class="pm" onclick="chg('${p.id}','plus5',-1)" ${enableInputs ? '' : 'disabled'}>−</button>
+          <div class="value bonus-val">${p.plus5}</div>
+          <button class="pm" onclick="chg('${p.id}','plus5',+1)" ${enableInputs ? '' : 'disabled'}>+</button>
+        </div>
+      </td>
+      <td>
+        <div class="value-control">
+          <button class="pm" onclick="chg('${p.id}','minus5',-1)" ${enableInputs ? '' : 'disabled'}>−</button>
+          <div class="value malus-val">${p.minus5}</div>
+          <button class="pm" onclick="chg('${p.id}','minus5',+1)" ${enableInputs ? '' : 'disabled'}>+</button>
+        </div>
+      </td>
+      <td>
+        <button class="btn-danger" onclick="removePlayer('${p.id}')" ${gameStarted ? 'disabled' : ''}>✕</button>
+      </td>`;
+    tbody.appendChild(tr);
+  });
+
+  renderRanking();
+  updateInfo();
+  updateButtonsState();
+}
+
+/* ================================================================
+   RENDER: RANKING
+   ================================================================ */
+function renderRanking() {
+  const box = $('#ranking');
+  box.innerHTML = '';
+  const sorted = [...players].sort((a,b) => b.points - a.points);
+  sorted.forEach((p, i) => {
+    const idx = players.indexOf(p);
+    const emoji = PLAYER_EMOJIS[idx % PLAYER_EMOJIS.length];
+    const color = PLAYER_COLORS[idx % PLAYER_COLORS.length];
+    const rage = getRageLevel(p.id);
+    const posClass = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
+    const medals = ['🥇','🥈','🥉'];
+
+    const div = document.createElement('div');
+    div.className = 'rank-item' + (i === 0 ? ' first' : '');
+    div.innerHTML = `
+      <div class="rank-pos ${posClass}">${i < 3 ? medals[i] : '#' + (i+1)}</div>
+      <span style="font-size:18px;">${emoji}</span>
+      <div class="rank-name" style="color:${color}">${p.name}</div>
+      <div class="rank-rage">
+        <div class="rage-bar"><div class="rage-fill" style="width:${rage}%;background:${rageColor(rage)}"></div></div>
+        <span class="rage-emoji">${rageEmoji(rage)}</span>
+      </div>
+      <div class="rank-pts">${p.points}</div>`;
+    box.appendChild(div);
+  });
+}
+
+/* ================================================================
+   RENDER: HISTORY
+   ================================================================ */
+function renderHistory() {
+  const host = $('#history');
+  host.innerHTML = '';
+  if (roundHistory.length === 0) {
+    host.innerHTML = '<div class="small" style="margin-top:8px;">Noch keine abgeschlossenen Runden.</div>';
+    return;
+  }
+  roundHistory.forEach(r => {
+    const d = document.createElement('details');
+    d.className = 'round';
+    d.innerHTML = `
+      <summary>Runde ${r.round} · ${r.cards} Karten</summary>
+      <div class="table-wrap history-table">
+        <table>
+          <thead>
+            <tr><th>Spieler</th><th>Tipp</th><th>Stiche</th><th>+5</th><th>−5</th><th>Runde</th><th>Gesamt</th></tr>
+          </thead>
+          <tbody>
+          ${r.entries.map(e => {
+            const pl = byId(e.id);
+            const perfect = e.pred === e.tricks;
+            return `<tr style="${perfect ? 'color:var(--green);' : e.roundPoints < 0 ? 'color:var(--red);' : ''}">
+              <td style="text-align:left;padding-left:8px;font-weight:700;">${pl?.name ?? '??'}</td>
+              <td>${e.pred}</td><td>${e.tricks}</td><td>${e.plus5}</td><td>${e.minus5}</td>
+              <td style="font-weight:800;">${e.roundPoints > 0 ? '+' : ''}${e.roundPoints}</td>
+              <td style="font-weight:800;">${e.totalAfter}</td>
+            </tr>`;
+          }).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="row" style="margin-top:8px;">
+        <button class="btn-ghost" onclick="editRound(${r.round})" style="font-size:12px;">✏️ Runde ${r.round} bearbeiten</button>
+      </div>`;
+    host.appendChild(d);
+  });
+}
+
+/* ================================================================
+   PLAYER MANAGEMENT
+   ================================================================ */
+$('#btnAdd').addEventListener('click', () => {
+  if (gameStarted) return;
+  const name = $('#playerName').value.trim();
+  if (!name) return showToast('Bitte einen Namen eingeben! ✏️');
+  if (players.some(p => p.name.toLowerCase() === name.toLowerCase())) return showToast('Name schon vergeben! 🙅');
+  if (players.length >= 10) return showToast('Maximum 10 Spieler! 🛑');
+  players.push({ id: uid(), name, points: 0, roundPoints: 0, prediction: 0, tricks: 0, plus5: 0, minus5: 0 });
+  order.push(players[players.length-1].id);
+  $('#playerName').value = '';
+  renderPlayersTable();
+  showToast(`${name} ist dabei! 🎉`);
+});
+$('#playerName').addEventListener('keydown', e => { if (e.key === 'Enter') $('#btnAdd').click(); });
+
+function addPreset(btn, name) {
+  if (gameStarted) return;
+  if (players.some(p => p.name.toLowerCase() === name.toLowerCase())) return showToast(name + ' ist bereits dabei! 🙅');
+  if (players.length >= 10) return showToast('Maximum 10 Spieler! 🛑');
+  players.push({ id: uid(), name, points: 0, roundPoints: 0, prediction: 0, tricks: 0, plus5: 0, minus5: 0 });
+  order.push(players[players.length-1].id);
+  btn.classList.add('used');
+  renderPlayersTable();
+}
+
+function removePlayer(id) {
+  if (gameStarted) return;
+  const p = byId(id);
+  players = players.filter(p => p.id !== id);
+  order = order.filter(x => x !== id);
+  renderPlayersTable();
+  if (p) showToast(p.name + ' entfernt 👋');
+}
+
+/* ================================================================
+   VALUE CHANGES
+   ================================================================ */
+function chg(id, field, delta) {
+  const p = byId(id);
+  if (!p) return;
+  if (!gameStarted && editModeRoundNo === 0) return;
+  if (field === 'prediction' && editModeRoundNo === 0) return;
+  p[field] = Math.max(0, (p[field] || 0) + delta);
+  renderPlayersTable();
+}
+
+/* ================================================================
+   GAME FLOW
+   ================================================================ */
+function startGame() {
+  if (gameStarted) return;
+  if (players.length < 2) return showToast('Mindestens 2 Spieler! 🎮');
+
+  dealerIndex = 0;
+  predictorIndex = players.length > 1 ? 1 : 0;
+  gameStarted = true;
+  predictionsLocked = false;
+
+  $('#btnStart').style.display = 'none';
+  $('#playerSetup').style.display = 'none';
+  $('#gameOverBanner').style.display = 'none';
+
+  showToast('🔥 Spiel gestartet! Vorhersagen eingeben!');
+  renderPlayersTable();
+}
+
+/* ================================================================
+   PREDICTION DIALOG
+   ================================================================ */
+const modal = $('#modalBackdrop');
+let predOrder = [], predStep = 0;
+
+function openPredictionDialog() {
+  if (!gameStarted || editModeRoundNo > 0) return;
+  predOrder = order.slice();
+  const startId = players[predictorIndex]?.id;
+  while (predOrder[0] !== startId) predOrder.push(predOrder.shift());
+  predStep = 0;
+  $('#predRound').textContent = currentRound;
+  $('#predHelp').textContent = `Beginnt: ${players[predictorIndex].name}, dann im Uhrzeigersinn.`;
+  renderPredictionProgress();
+  renderPredictionBody();
+  modal.style.display = 'flex';
+  modal.setAttribute('aria-hidden','false');
+}
+
+function renderPredictionProgress() {
+  const box = $('#predProgress');
+  box.innerHTML = '';
+  predOrder.forEach((id, i) => {
+    const dot = document.createElement('div');
+    dot.className = 'pred-dot';
+    if (i < predStep) dot.classList.add('done');
+    if (i === predStep) dot.classList.add('current');
+    box.appendChild(dot);
+  });
+}
+
+function renderPredictionBody() {
+  const id = predOrder[predStep];
+  const p = byId(id);
+  const idx = players.indexOf(p);
+  const emoji = PLAYER_EMOJIS[idx % PLAYER_EMOJIS.length];
+  const color = PLAYER_COLORS[idx % PLAYER_COLORS.length];
+
+  $('#predBody').innerHTML = `
+    <div class="pred-player-name" style="text-align:center;">
+      <span style="font-size:28px;margin-right:6px;">${emoji}</span>
+      <span style="color:${color}">${p.name}</span>
+    </div>
+    <div style="text-align:center;margin-top:4px;">
+      <span class="badge">${cardsThisRound} Karten</span>
+    </div>
+    <div class="pred-value-area">
+      <button class="pred-big-btn" onclick="predDelta(-1)">−</button>
+      <div class="pred-big-val" id="predVal">${p.prediction}</div>
+      <button class="pred-big-btn" onclick="predDelta(+1)">+</button>
+    </div>`;
+
+  $('#btnPredNext').textContent = (predStep === predOrder.length - 1) ? '✅ Fertig' : 'Weiter ➜';
+  renderPredictionProgress();
+}
+
+function predDelta(d) {
+  const id = predOrder[predStep];
+  const p = byId(id);
+  p.prediction = Math.max(0, (p.prediction || 0) + d);
+  const el = $('#predVal');
+  el.textContent = p.prediction;
+  el.classList.remove('pop');
+  void el.offsetWidth;
+  el.classList.add('pop');
+}
+
+function predictionNext() {
+  if (predStep < predOrder.length - 1) {
+    predStep++;
+    renderPredictionBody();
+  } else {
+    predictionsLocked = true;
+    closePredictionDialog();
+    showToast('Vorhersagen stehen! Jetzt Stiche erfassen! ✏️');
+    renderPlayersTable();
+  }
+}
+
+function closePredictionDialog() {
+  modal.style.display = 'none';
+  modal.setAttribute('aria-hidden','true');
+  updateButtonsState();
+}
+
+function reopenPredictions() {
+  if (!gameStarted) return;
+  predictionsLocked = false;
+  openPredictionDialog();
+}
+
+/* ================================================================
+   SCORING
+   ================================================================ */
+function calcRoundPointsForPlayer(p) {
+  let rp = 0;
+  rp += (p.prediction === p.tricks) ? 10 : -5;
+  rp += p.tricks;
+  rp += (p.plus5 || 0) * 5;
+  rp -= (p.minus5 || 0) * 5;
+  return rp;
+}
+
+function scoreRound() {
+  if (!canScoreRound()) {
+    const sum = sumTricksNow(), need = requiredTricksForRound();
+    if (!predictionsLocked) showToast('Vorhersagen sind noch nicht abgeschlossen! 🔮');
+    else {
+      showToast(`Stiche: ${sum} ≠ ${need}! Bitte korrigieren! ⚠️`);
+      $('#trickSumHint').classList.add('shake');
+      setTimeout(() => $('#trickSumHint').classList.remove('shake'), 400);
+    }
+    return;
+  }
+
+  // Calculate points
+  const entries = [];
+  let anyPerfect = false;
+  const comments = [];
+
+  players.forEach(p => {
+    p.roundPoints = calcRoundPointsForPlayer(p);
+    p.points += p.roundPoints;
+  });
+
+  players.forEach((p, idx) => {
+    const perfect = p.prediction === p.tricks;
+    const diff = Math.abs(p.prediction - p.tricks);
+    const emoji = PLAYER_EMOJIS[idx % PLAYER_EMOJIS.length];
+
+    if (perfect) {
+      anyPerfect = true;
+      comments.push({ name: p.name, emoji, text: p.prediction === 0 ? randomFrom(TALK_ZERO_HERO) : randomFrom(TALK_PERFECT), type: 'good' });
+    } else if (diff >= 2) {
+      comments.push({ name: p.name, emoji, text: randomFrom(TALK_FAIL), type: 'bad' });
+    }
+    if (p.plus5 > 0) comments.push({ name: p.name, emoji, text: randomFrom(TALK_BONUS), type: 'bonus' });
+    if (p.minus5 > 0) comments.push({ name: p.name, emoji, text: randomFrom(TALK_MALUS), type: 'malus' });
+
+    entries.push({ id: p.id, pred: p.prediction, tricks: p.tricks, plus5: p.plus5, minus5: p.minus5, roundPoints: p.roundPoints, totalAfter: p.points });
+  });
+
+  roundHistory.push({ round: currentRound, cards: cardsThisRound, entries, closed: true });
+
+  // Show trash talk
+  renderTrashTalk(comments);
+
+  // Confetti for perfect predictions
+  if (anyPerfect) fireConfetti();
+
+  // Reset round fields
+  players.forEach(p => { p.prediction = 0; p.tricks = 0; p.plus5 = 0; p.minus5 = 0; });
+  predictionsLocked = false;
+
+  // Next round
+  currentRound++;
+  cardsThisRound = Math.max(1, cardsThisRound - 1);
+  if (predictorIndex < 0) predictorIndex = 0;
+  dealerIndex = predictorIndex;
+  predictorIndex = (dealerIndex + 1) % players.length;
+
+  if (currentRound > totalRounds) {
+    const sorted = [...players].sort((a,b) => b.points - a.points);
+    const winner = sorted[0];
+    renderPlayersTable(); renderHistory(); updateInfo();
+    fireConfetti();
+    setTimeout(fireConfetti, 1000);
+    showGameOver(winner);
+    $('#btnRoundPredict').disabled = true;
+    $('#btnScore').disabled = true;
+    $('#btnAdjust').disabled = true;
+    return;
+  }
+
+  renderPlayersTable(); renderHistory(); updateInfo();
+  $('#btnRoundPredict').disabled = false;
+  $('#btnScore').disabled = true;
+  $('#btnAdjust').disabled = true;
+}
+
+function renderTrashTalk(comments) {
+  const box = $('#trashTalk');
+  box.innerHTML = '';
+  comments.forEach((c, i) => {
+    const div = document.createElement('div');
+    div.className = 'trash-msg';
+    div.style.animationDelay = (i * 0.12) + 's';
+    const borderColor = c.type === 'good' ? 'var(--green)' : c.type === 'bad' ? 'var(--red)' : c.type === 'bonus' ? 'var(--yellow)' : 'var(--purple)';
+    div.style.borderLeftColor = borderColor;
+    div.style.borderLeftWidth = '3px';
+    div.innerHTML = `<span style="margin-right:4px;">${c.emoji}</span> <b>${c.name}</b> — ${c.text}`;
+    box.appendChild(div);
+  });
+  // Clear after a while
+  setTimeout(() => { box.innerHTML = ''; }, 8000);
+}
+
+function showGameOver(winner) {
+  const banner = $('#gameOverBanner');
+  const idx = players.indexOf(winner);
+  const emoji = PLAYER_EMOJIS[idx % PLAYER_EMOJIS.length];
+  banner.style.display = 'block';
+  banner.innerHTML = `
+    <div class="trophy">🏆</div>
+    <div style="font-family:'Bangers',cursive;font-size:28px;letter-spacing:3px;color:var(--red);margin:8px 0;">GAME OVER!</div>
+    <div class="winner-name">${emoji} ${winner.name} ${emoji}</div>
+    <div class="winner-pts">${winner.points} Punkte</div>
+    <div style="margin-top:12px;">
+      <button class="btn-primary" onclick="resetGame()" style="font-size:16px;padding:12px 24px;">🔄 Neues Spiel</button>
+    </div>`;
+}
+
+function resetGame() {
+  players.forEach(p => { p.points = 0; p.roundPoints = 0; p.prediction = 0; p.tricks = 0; p.plus5 = 0; p.minus5 = 0; });
+  gameStarted = false;
+  currentRound = 1;
+  cardsThisRound = 10;
+  dealerIndex = -1;
+  predictorIndex = -1;
+  predictionsLocked = false;
+  editModeRoundNo = 0;
+  roundHistory = [];
+
+  $('#btnStart').style.display = '';
+  $('#playerSetup').style.display = '';
+  $('#gameOverBanner').style.display = 'none';
+  $('#trashTalk').innerHTML = '';
+  // Reset preset buttons
+  document.querySelectorAll('.preset-btn').forEach(b => {
+    if (players.some(p => p.name === b.textContent)) b.classList.add('used');
+    else b.classList.remove('used');
+  });
+
+  renderPlayersTable(); renderHistory(); updateInfo();
+}
+
+/* ================================================================
+   HISTORY EDIT
+   ================================================================ */
+function editRound(roundNo) {
+  const idx = roundHistory.findIndex(r => r.round === roundNo);
+  if (idx < 0) return showToast('Runde nicht gefunden! 🤔');
+  const r = roundHistory[idx];
+
+  players.forEach(p => {
+    const E = r.entries.find(e => e.id === p.id) || { pred: 0, tricks: 0, plus5: 0, minus5: 0 };
+    p.prediction = E.pred; p.tricks = E.tricks; p.plus5 = E.plus5; p.minus5 = E.minus5; p.roundPoints = 0;
+  });
+
+  editModeRoundNo = roundNo;
+  const toolbar = $('#editToolbar');
+  toolbar.style.display = 'flex';
+  toolbar.innerHTML = `
+    <button class="btn-primary" onclick="saveRoundEdit(${roundNo},${idx})">💾 Runde ${roundNo} speichern</button>
+    <button class="btn-ghost" onclick="cancelRoundEdit()">Abbrechen</button>
+    <span class="hint">Stiche müssen = ${r.cards} sein.</span>`;
+  $('#btnRoundPredict').disabled = true;
+  $('#btnScore').disabled = true;
+  $('#btnAdjust').disabled = true;
+  renderPlayersTable();
+  showToast(`Runde ${roundNo} wird bearbeitet ✏️`);
+}
+
+function cancelRoundEdit() {
+  editModeRoundNo = 0;
+  $('#editToolbar').style.display = 'none';
+  players.forEach(p => { p.prediction = 0; p.tricks = 0; p.plus5 = 0; p.minus5 = 0; p.roundPoints = 0; });
+  renderPlayersTable(); renderHistory(); updateButtonsState();
+}
+
+function saveRoundEdit(roundNo, idx) {
+  const r = roundHistory[idx];
+  const need = r.cards;
+  const got = players.reduce((s,p) => s + (p.tricks || 0), 0);
+  if (got !== need) {
+    showToast(`Stiche: ${got} ≠ ${need}! ⚠️`);
+    return;
+  }
+
+  const newEntries = players.map(p => {
+    const rp = calcRoundPointsForPlayer(p);
+    return { id: p.id, pred: p.prediction, tricks: p.tricks, plus5: p.plus5, minus5: p.minus5, roundPoints: rp, totalAfter: 0 };
+  });
+  r.entries = newEntries;
+
+  // Recalculate all totals
+  players.forEach(p => { p.points = 0; p.roundPoints = 0; });
+  for (const R of roundHistory) {
+    R.entries.forEach(e => { byId(e.id).points += e.roundPoints; });
+    R.entries.forEach(e => { e.totalAfter = byId(e.id).points; });
+  }
+
+  cancelRoundEdit();
+  showToast(`Runde ${roundNo} aktualisiert! ✅`);
+}
+
+/* ================================================================
+   KEYBOARD IN MODAL
+   ================================================================ */
+document.addEventListener('keydown', e => {
+  if ($('#modalBackdrop').style.display === 'flex') {
+    if (e.key === '+' || e.key === 'ArrowUp') { e.preventDefault(); predDelta(+1); }
+    if (e.key === '-' || e.key === 'ArrowDown') { e.preventDefault(); predDelta(-1); }
+    if (e.key === 'Enter') predictionNext();
+    if (e.key === 'Escape') closePredictionDialog();
+  }
+});
+
+/* ================================================================
+   INIT
+   ================================================================ */
+renderPlayersTable(); renderHistory(); updateInfo();
+</script>
+</body>
+</html>
